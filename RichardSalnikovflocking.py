@@ -87,8 +87,7 @@ def limit_vector(vec, max_value):
 
 ##Limits vector length.
 #
-# A vector has:
-# direction and magnitude
+# A vector has: direction and magnitude.
 # Magnitude is the speed/force strength.
 # If magnitude becomes too large: movement explodes
 
@@ -157,8 +156,7 @@ class Boid:
 
 ### Converts angle into movement vector
 #
-# Uses unit circle:
-# (cos(theta), sin(theta))
+# Uses unit circle: (cos(theta), sin(theta))
 
         self.acceleration = [0, 0]
 
