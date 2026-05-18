@@ -2,15 +2,13 @@
 #RichardSalnikov
 
 import pygame
-#Used for: opening a window, drawing graphics, handling input, timing
+#This is used for opening a window, drawing graphics, handling input, timing
 
 import random
-#Used to: spawn boids at random positions, give random starting directions
+#This is used to spawn boids at random positions, give random starting directions
 
 import math
-#Used for: trigonometry, vector calculations, square roots, angles
-
-# Settings
+#This is used for trigonometry, vector calculations, square roots, angles
 
 WIDTH, HEIGHT = 1000, 700
 NUM_BOIDS = 80
@@ -32,12 +30,10 @@ NEIGHBOR_RADIUS = 50
 SEPARATION_RADIUS = 25
 #Neighbor Radius: How far a boid can "see".
 #Inside this range: alignment works, cohesion works
-#
-#Separation Radius:
-#Smaller radius for collision avoidance.
+#Separation Radius: Smaller radius for collision avoidance.
 #Inside this range the boids repel each other
 
-###________
+#####________
 ALIGNMENT_WEIGHT = 1.0
 COHESION_WEIGHT = 0.8
 SEPARATION_WEIGHT = 1.5
@@ -53,7 +49,7 @@ obstacle_pos = [500, 500]
 
 
 
-
+##_____________________
 
 # These scale the behaviors.
 # The final steering force is: # F=aA+cC+sS
@@ -68,7 +64,7 @@ obstacle_pos = [500, 500]
 
 
 
-##_____________________________
+########_____________________________
 pygame.init()
 #pygame.init() Starts all pygame systems.
 
@@ -100,15 +96,13 @@ def limit_vector(vec, max_value):
 
         scale = max_value / length
 
-### If vector is too large, then it must be shrunk proportionally
-#
-# This preserves direction.
+### If vector is too large, then it must be shrunk proportionally. This preserves direction.
 
         return [vec[0] * scale, vec[1] * scale]
 
     return vec
 
-
+###_______________-----__
 def normalize(vec):
 
     length = math.hypot(vec[0], vec[1])
@@ -116,13 +110,11 @@ def normalize(vec):
     if length == 0:
         return [0, 0]
 
-### Converts vector into unit vector
-#
+### This converts the vector into a unit vector
 # Formula:
 # v^ = v / |v|
 #
-# Keeps direction
-# Makes magnitude = 1
+# It keeps direction and makes magnitude = 1
 
     return [vec[0] / length, vec[1] / length]
 
@@ -155,13 +147,12 @@ class Boid:
         ]
 
 ### Converts angle into movement vector
-#
 # Uses unit circle: (cos(theta), sin(theta))
 
         self.acceleration = [0, 0]
 
-### Stores forces for current frame
-# This is the force accumulator
+###### Stores forces for current frame
+### This is the force accumulator
 
 
     def update(self):
@@ -169,41 +160,34 @@ class Boid:
 
 ### Physics integration step
 
-# Using Euler integration
+#### Using Euler integration
 
         self.velocity[0] += self.acceleration[0]
         self.velocity[1] += self.acceleration[1]
 
 ### Implements:
-# v(t+1) = v(t) + a*(delta)t
+#@# v(t+1) = v(t) + a*(delta)t
 
         self.velocity = limit_vector(self.velocity, MAX_SPEED)
 
-### Caps velocity
-#
-# Prevents infinite acceleration
+### This caps the velocity to prevent infinite acceleration
 
         self.position[0] += self.velocity[0]
         self.position[1] += self.velocity[1]
 
-### Implements:
-
+# Implementing
 # x(t+1) = x(t) + v*(delta)t
 
         self.acceleration = [0, 0]
 
-### IMPORTANT
-#
-# Forces only apply for ONE frame
-#
+
+### :::::________Forces only apply for ONE frame ONLY
 # Next frame: recomputes all flocking forces again
 
         self.wrap_edges()
 
 ### Teleports boids across screen edges
-#
-# Without this:
-# the boids will disappear forever
+# Without this the boids will disappear forever
 
 
     def apply_force(self, force):
@@ -212,21 +196,20 @@ class Boid:
         self.acceleration[1] += force[1]
 
 ### This adds force into acceleration accumulator
-#
+    
 # It is equivalent to: F_total = F1 + F2 + F3
 
 
     def flock(self, boids):
 
+        
+
+        
+        #######################_________________________________-
 ### Main AI behavior
-#
-# It calculates:
-# alignment
-# cohesion
-# separation
-# obstacle avoidance
-#
-# Then combines them
+
+# It calculates: alignment, cohesion, separation, obstacle avoidance
+# And then it combines them
 
         alignment = self.align(boids)
         cohesion = self.cohesion(boids)
@@ -242,9 +225,7 @@ class Boid:
         separation[0] *= SEPARATION_WEIGHT
         separation[1] *= SEPARATION_WEIGHT
 
-### Obstacle avoidance gets extra strength
-#
-# Makes boids strongly avoid obstacle
+### The obstacle avoidance gets extra strength, which in turn makes boids strongly avoid obstacle
 
         avoidance[0] *= 2.5
         avoidance[1] *= 2.5
@@ -257,7 +238,7 @@ class Boid:
 
     def align(self, boids):
 
-### The Goal is to match neighbor velocity
+# The Goal is to match neighbor velocity
 
         steering = [0, 0]
         total = 0
@@ -266,18 +247,16 @@ class Boid:
 
             d = distance(self.position, other.position)
 
-### Distance formula:
-# sqrt((x_2 - x_1)^2 + (y_2 - y_1)^2)
+## The Distance formula: sqrt((x_2 - x_1)^2 + (y_2 - y_1)^2)
 
             if other != self and d < NEIGHBOR_RADIUS:
 
                 steering[0] += other.velocity[0]
                 steering[1] += other.velocity[1]
 
-### Adds all neighbor velocities
+### Adding all neighbor velocities
 #
-# Computes:
-# v_avg = (Sum)v / n
+# Computes: v_avg = (Sum)v / n
 
                 total += 1
 
@@ -294,9 +273,7 @@ class Boid:
             steering[0] -= self.velocity[0]
             steering[1] -= self.velocity[1]
 
-### The steering formula:
-# v_steer = v_desired - v_current
-#
+### The steering formula: v_steer = v_desired - v_current
 # Produces smooth turning
 
             steering = limit_vector(steering, MAX_FORCE)
@@ -306,7 +283,7 @@ class Boid:
 
     def cohesion(self, boids):
 
-### My goal is to move toward center of flock
+### My goal here is to move toward center of flock
 
         steering = [0, 0]
         total = 0
@@ -366,14 +343,14 @@ class Boid:
                     self.position[1] - other.position[1]
                 ]
 
-### Vector is now pointing away from neighbor
+# Vector is now pointing away from neighbor
 
                 if d != 0:
 
                     diff[0] /= d
                     diff[1] /= d
 
-### Closer boids create stronger repulsion, approximates inverse-distance force
+# Closer boids create stronger repulsion, approximates inverse-distance force
 
                 steering[0] += diff[0]
                 steering[1] += diff[1]
@@ -400,7 +377,7 @@ class Boid:
 
     def avoid_obstacle(self):
 
-### My Goal here is to avoid the movable obstacle/dot
+# My Goal here is to avoid the movable obstacle/dot
 
         steering = [0, 0]
 
@@ -420,7 +397,7 @@ class Boid:
                 steering[0] /= d
                 steering[1] /= d
 
-### Closer obstacle = stronger repulsion
+# Closer obstacle = stronger repulsion
 
             steering = normalize(steering)
 
@@ -514,7 +491,7 @@ def distance(a, b):
 
 
 
-# Main part
+# The main part
 
 boids = [Boid() for _ in range(NUM_BOIDS)]
 
@@ -554,7 +531,6 @@ while running:
     screen.fill((20, 20, 30))
 
 ### Clears screen every frame
-#
 # Prevents trails
 
 ### Drawing the movable obstacle
@@ -579,6 +555,6 @@ while running:
 
     pygame.display.flip()
 
-### Updates entire screen
+### Updating entire screen
 
 pygame.quit()
